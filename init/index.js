@@ -1,22 +1,28 @@
-const mongoose=require("mongoose");
-const initdata=require("./data.js");
-const Listing=require("../models/listing.js");
+const mongoose = require("mongoose");
+const initdata = require("./data.js");
+const Listing = require("../models/listing.js");
+const dotenv = require("dotenv");
+const path = require("path");
 
-const MONGO_URL='mongodb://127.0.0.1:27017/wanderwall';
-main()
-.then(res=>console.log("connected to db"))
-.catch(err => console.log(err));
- 
+
+dotenv.config({ path: path.join(__dirname, "../.env") });
+
+const MONGO_URL = process.env.MONGO_URI || process.env.MONGO_URL;
+
 async function main() {
-  await mongoose.connect(MONGO_URL);
-  
+  try {
+    await mongoose.connect(MONGO_URL);
+    console.log(" Connected to MongoDB for seeding!");
+
+    await Listing.deleteMany({});
+    await Listing.insertMany(initdata.data);
+    console.log(" Data successfully initialized!");
+
+    mongoose.connection.close();
+    console.log(" Database connection closed.");
+  } catch (err) {
+    console.error(" Error initializing database:", err.message);
+  }
 }
 
-const initDB=async()=>{
-  await Listing.deleteMany({});
-   await Listing.insertMany(initdata.data);
-  console.log("data is initialized");
-
-}
-
-initDB();
+main();
