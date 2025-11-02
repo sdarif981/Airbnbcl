@@ -27,7 +27,7 @@ async function main() {
 
 }
 app.get("/",(req,res)=>{
-  res.send("Iam here");
+  res.redirect("/listings")
 });
 
 app.delete("/listings/:id",async(req,res)=>{
